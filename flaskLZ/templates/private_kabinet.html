@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+</head>
+<body>
+    <form method="post" action="/private_kabinet">
+    <div class="form-group">
+        <label for="name">Имя пользователя:</label>
+        <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
+    </div>
+
+    <div>
+        <label for="surname">Фамилия пользователя:</label>
+        <input type="text" id="surname" name="surname" placeholder="Введите вашу Фамилию" required> 
+    </div>
+
+    <div class="form-group">
+        <label for="password">Логин:</label>
+        <input type="text" id="login" name="login" placeholder="Введите ваш Логин" required>
+    </div>
+        <label for="email">email:</label>
+        <input type="email" id="email" name="email" placeholder="Введите ваш email" required>
+    <div>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required>
+    </div>
+
+    <div>
+        <label for="birthdate">Пароль:</label>
+        <input type="date" id="birthdate" name="birthdate" placeholder="Введите вашу дату рождения" required>
+    </div>
+
+            <button type="submit" id="loginBtn">Войти</button>
+</form>
+</body>
+</html>

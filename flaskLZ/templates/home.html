@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добро пожаловать</title>
+    <link rel="icon" href="/sorces/images/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        #n1{
+            background-color: #54dbc9;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #222;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #change_page {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #change_page:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        #logout {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #logout:hover {
+            background-color: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .info {
+            width: 400px;       
+            height: 90px; 
+            padding: 15px;
+            border: 2px solid #000000;
+            border-radius: 14px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            font-size: 20px;
+            box-sizing: border-box;
+            resize: none;
+            overflow-y: auto; 
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+   
+    <div id="n1">
+        {% if user %}
+            <h2>{{ user.username }}</h2>
+            <!-- <img src="" alt=""> -->
+             <div class="str">
+                <textarea class="info" id="info1" placeholder="Личная информация"></textarea>
+                <textarea class="info" id="info2" placeholder="Работа с учетной записью"></textarea>
+                <textarea class="info" id="info3" placeholder="Краткая информация"></textarea>
+                <textarea class="info" id="info4" placeholder="Развернутая информация"></textarea>
+                <textarea class="info" id="info5" placeholder="Список проектов"></textarea>
+            </div>
+
+            <script>
+                const notes = document.querySelectorAll('.note-box');
+
+                notes.forEach(note => {
+                    const storageKey = note.id; 
+                    note.value = localStorage.getItem(storageKey) || '';
+
+                    note.addEventListener('input', () => {
+                        localStorage.setItem(storageKey, note.value);
+                    });
+                });
+            </script>
+            <a id="logout" href="/logout">👋 Покинуть нас</a>
+        {% else %}
+            <a id="change_page" href="/admins">Войти в аккаунт</a>
+        {% endif %}
+    </div>
+    
+    
+    <footer>Автоматический выход произойдет через 3 минуты бездействия ⏳</footer>
+
+    <script>
+        const INACTIVITY_LIMIT = 3 * 60 * 1000;
+
+        let inactivityTimer;
+
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                window.location.href = "/";
+            }, INACTIVITY_LIMIT);
+        }
+
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
+    </script>
+</body>
+</html>
