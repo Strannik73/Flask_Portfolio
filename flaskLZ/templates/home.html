@@ -1,145 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добро пожаловать</title>
-    <link rel="icon" href="/sorces/images/favicon.ico" type="image/x-icon">
+    <title>Home</title>
+
     <style>
         body {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f09b3b 0%, #f3e284 100%);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            justify-content: flex-start;
+            font-family: Arial;
+            background: linear-gradient(135deg, #ff9b29, #f9e15b);
             text-align: center;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+
+        h1, h2 {
             color: #222;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         a {
             display: inline-block;
             margin: 10px;
-            padding: 12px 24px;
-            text-decoration: none;
-            font-size: 1.1rem;
+            padding: 10px 15px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         #change_page {
-            background-color: #ffac4e;
-            border: 2px solid #000000;
-
-            color: rgb(0, 0, 0);
-        }
-
-        #change_page:hover {
-            background-color: #ffbc58;
-            transform: scale(1.05);
+            background: #ffac4e;
+            border: 2px solid #000;
+            color: #000;
         }
 
         #logout {
-            background-color: #f44336;
+            background: #f44336;
             color: white;
         }
 
-        #logout:hover {
-            background-color: #d32f2f;
-            transform: scale(1.05);
+        .user-card {
+            background: white;
+            margin: 20px auto;
+            padding: 10px;
+            width: 450px;
+            border-radius: 10px;
+            border: 2px solid #000;
         }
 
-        footer {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #555;
-        }
         .info {
-            width: 400px;       
-            height: 90px; 
-            padding: 15px;
-            border: 2px solid #000000;
-            border-radius: 14px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-            font-size: 20px;
-            box-sizing: border-box;
+            width: 400px;
+            height: 80px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            margin: 5px 0;
             resize: none;
-            overflow-y: auto; 
-            white-space: pre-wrap;
         }
     </style>
 </head>
+
 <body>
-   
-    <div id="n1">
-        {% if user %}
-            <h2>{{ user.username }}</h2>
-            <!-- <img src="" alt=""> -->
-             <div class="str">
-                <textarea class="info" id="info1" placeholder="Личная информация"></textarea>
-                <textarea class="info" id="info2" placeholder="Работа с учетной записью"></textarea>
-                <textarea name="info_short" placeholder="Краткая информация" class="info">{{ user.info_short }}</textarea>
-                <textarea name="info_full" placeholder="Развернутая информация" class="info">{{ user.info_full }}</textarea>
-                <textarea name="projects" placeholder="Список проектов" class="info">{{ user.projects }}</textarea>
 
-                <button id="save "type="submit">Сохранить</button>
-            </div>
+{% if user %}
 
-            <script>
-                const notes = document.querySelectorAll('.note-box');
+    {% include "ls.html" %}
 
-                notes.forEach(note => {
-                    const storageKey = note.id; 
-                    note.value = localStorage.getItem(storageKey) || '';
+{% else %}
 
-                    note.addEventListener('input', () => {
-                        localStorage.setItem(storageKey, note.value);
-                    });
-                });
-            </script>
-            <a id="logout" href="/logout">Покинуть нас</a>
-        {% else %}
-            <a id="change_page" href="/admins">Войти в аккаунт</a>
-            <h1>Список пользователей</h1>
+    <a id="change_page" href="/login">Войти в аккаунт</a>
+    <a id="change_page" href="/register">Регистрация</a>
 
-            {% for u in users %}
-                <div class="user-card" style="margin:20px; padding:15px; border:2px solid #000; border-radius:10px; background:#fff;">
-                    <h2>{{ u.username }}</h2>
+    <h1>Список пользователей</h1>
 
-                    <textarea class="info" readonly>{{ u.info_short }}</textarea>
-                    <textarea class="info" readonly>{{ u.info_full }}</textarea>
-                    <textarea class="info" readonly>{{ u.projects }}</textarea>
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-    
+    {% for u in users %}
+        <div class="user-card">
+            <h3>{{ u.username }}</h3>
 
-    <script>
-        const INACTIVITY_LIMIT = 3 * 60 * 1000;
+            {% if u.username in user_infos %}
+                <p>{{ user_infos[u.username].info_short }}</p>
+                <p>{{ user_infos[u.username].info_full }}</p>
+                <p>{{ user_infos[u.username].projects }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
 
-        let inactivityTimer;
+{% endif %}
 
-        function resetTimer() {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(() => {
-                window.location.href = "/";
-            }, INACTIVITY_LIMIT);
-        }
-
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
-    </script>
 </body>
 </html>

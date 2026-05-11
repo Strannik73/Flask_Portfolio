@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #feaf38 0%, #f4c8a6 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #222;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info {
+            width: 400px;
+            height: 90px;
+            margin: 8px;
+            padding: 10px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            resize: none;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin-top: 10px;
+            background-color: #ff9040;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid #000;
+
+        }
+
+        button:hover {
+            background-color: #ff9040;
+            transform: scale(1.05);
+        }
+
+        a {
+            margin-top: 20px;
+            text-decoration: none;
+            color: #f44336;
+            font-size: 1.1rem;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>{{ user.username }}</h2>
+
+<!-- Форма -->
+<form method="POST" action="/ls">
+    <textarea name="info1" class="info" placeholder="Личная информация">{{ user_info.info1 }}</textarea>
+    <textarea name="info2" class="info" placeholder="Работа с учетной записью">{{ user_info.info2 }}</textarea>
+    <textarea name="info_short" class="info" placeholder="Краткая информация">{{ user_info.info_short }}</textarea>
+    <textarea name="info_full" class="info" placeholder="Развернутая информация">{{ user_info.info_full }}</textarea>
+    <textarea name="projects" class="info" placeholder="Список проектов">{{ user_info.projects }}</textarea>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<button type="button" onclick="window.location.href='/logout'">Выйти</button>
+
+<script>
+    const username = "{{ user.username if user else '' }}";
+    const notes = document.querySelectorAll('.info');
+
+    function loadUserData() {
+        notes.forEach(note => {
+            const key = username + '_' + note.name;
+            note.value = localStorage.getItem(key) || note.value;
+        });
+    }
+
+    function saveUserData() {
+        notes.forEach(note => {
+            const key = username + '_' + note.name;
+            localStorage.setItem(key, note.value);
+        });
+    }
+
+    loadUserData();
+
+    notes.forEach(note => {
+        note.addEventListener('input', saveUserData);
+    });
+
+    const currentUserStored = localStorage.getItem('current_user');
+
+    if (currentUserStored !== username) {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+
+            if (key !== 'current_user' && !key.startsWith(username + '_')) {
+                localStorage.removeItem(key);
+            }
+        }
+
+        localStorage.setItem('current_user', username);
+        loadUserData();
+    }
+</script>
+
+</body>
+</html>
