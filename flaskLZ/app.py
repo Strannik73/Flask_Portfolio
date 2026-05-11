@@ -1,107 +1,76 @@
-from datetime import datetime
-import os
-import hashlib
-from flask import Flask, render_template, session, url_for, request, redirect, abort
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, session, redirect, url_for, request
+from auth import auth, db, Users
 
 app = Flask(__name__)
-# ОБЯЗАТЕЛЬНО добавь секретный ключ для работы сессий
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "your_super_secret_safe_key")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///first.db'
+app.config['SECRET_KEY'] = "secret"
+
+# основная база + бинды
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
+app.config['SQLALCHEMY_BINDS'] = {
+    'users': 'sqlite:///users.db',
+    'info': 'sqlite:///info.db'
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
-# Белые списки путей
-WHITE_URLS = {"/", "/login", "/register", "/logout", "/home"}
 
-# Модели
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+class UserInfo(db.Model):
+    __bind_key__ = 'info'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(30), unique=True)
+    info1 = db.Column(db.Text, default="")
+    info2 = db.Column(db.Text, default="")
+    info_short = db.Column(db.Text, default="")
+    info_full = db.Column(db.Text, default="")
+    projects = db.Column(db.Text, default="")
 
-# Middleware во Flask делается через before_request
-@app.before_request
-def check_auth():
-    # Пропускаем статику и белые URL
-    if request.path.startswith('/static') or request.path in WHITE_URLS:
-        return None
-    
-    # Проверка авторизации
-    if 'username' not in session:
-        return redirect(url_for('login'))
 
 @app.route("/")
 @app.route("/home")
 def home():
-    username_s = session.get('username')
-    user_obj = None
-    if username_s:
-        user_obj = Users.query.filter_by(username=username_s).first()
-    return render_template('home.html', user=user_obj)
-
-
-@app.route("/register", methods=['POST', 'GET'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        # Хеширование с использованием соли (в данном случае username)
-        salt = username.encode()
-        hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100).hex()
-        
-        new_user = Users(username=username, password=hashed_password)
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            
-            session['username'] = username
-            return redirect(url_for('home'))
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error: {e}")
-            return render_template('register.html', error="Пользователь уже существует")
-    
-    return render_template('register.html')
-
-@app.route("/login", methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
+    username = session.get('username')
+    if username:
         user = Users.query.filter_by(username=username).first()
-        
-        if user:
-            salt = username.encode()
-            input_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100).hex()
-            
-            if user.password == input_hash:
-                session['username'] = user.username
-                return redirect(url_for('home'))
-        
-        return render_template('login.html', error="Неверный логин или пароль")
-        
-    return render_template('login.html')
+        user_info = UserInfo.query.filter_by(username=username).first()
+        return render_template('home.html', user=user, user_info=user_info)
+
+    # если не авторизован — список пользователей и их info
+    users = Users.query.all()
+    infos = UserInfo.query.all()
+    return render_template('home.html', user=None, users=users, infos=infos)
+
+@app.route("/admins")
+def admins():
+    # при заходе на /admins сразу перебрасываем на страницу авторизации
+    return redirect(url_for('auth.login'))
+
 
 @app.route("/private_kabinet", methods=['GET', 'POST'])
 def kabinet():
     username = session.get('username')
-    user_obj = Users.query.filter_by(username=username).first()
-    
+    if not username:
+        return redirect(url_for('auth.login'))
+
+    user_info = UserInfo.query.filter_by(username=username).first()
+    if not user_info:
+        user_info = UserInfo(username=username)
+        db.session.add(user_info)
+        db.session.commit()
+
     if request.method == 'POST':
-        return redirect(url_for('home'))
-    
-    # Передаем объект, чтобы работало {{ user.username }}
-    return render_template('private_kabinet.html', user=user_obj)
+        user_info.info1 = request.form.get('info1')
+        user_info.info2 = request.form.get('info2')
+        user_info.info_short = request.form.get('info_short')
+        user_info.info_full = request.form.get('info_full')
+        user_info.projects = request.form.get('projects')
+        db.session.commit()
+        return redirect(url_for('kabinet'))
+
+    return render_template('private_kabinet.html', user_info=user_info)
 
 
-@app.route("/logout")
-def logout():
-    session.clear() 
-    return redirect(url_for('home'))
+app.register_blueprint(auth)
 
 if __name__ == "__main__":
     with app.app_context():

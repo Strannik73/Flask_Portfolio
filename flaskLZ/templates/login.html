@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            background: linear-gradient(135deg, #f09b3b 0%, #f3e284 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -24,6 +24,7 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+            border: 2px solid #000000;
         }
 
         h1 {
@@ -60,8 +61,8 @@
         #loginBtn {
             width: 100%;
             padding: 12px;
-            background-color: #2196F3;
-            color: white;
+            background-color: #fd8434;
+            color: rgb(0, 0, 0);
             border: none;
             border-radius: 6px;
             font-size: 1.1rem;
@@ -70,12 +71,12 @@
         }
 
         #loginBtn:hover {
-            background-color: #1976D2;
+            background-color: #eebe77;
             transform: scale(1.03);
         }
 
         .register-link {
-            color: #2196F3;
+            color: #f39821;
             text-decoration: none;
             font-weight: bold;
         }
@@ -93,7 +94,7 @@
 </head>
 <body>
     <div class="block active" id="block1">
-        <h1>🔐 Авторизация</h1>
+        <h1>Авторизация</h1>
             
         {% if error %}
         <div class="error-message">{{ error }}</div>

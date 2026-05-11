@@ -1,39 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-top: 30px;
+            color: #222;
+        }
+
+        .container {
+            background: #ffffffcc;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 700px;
+            margin-top: 20px;
+        }
+
+        .info {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin-top: 10px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: none;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #f44336;
+            font-size: 1.1rem;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <form method="post" action="/private_kabinet">
-    <div class="form-group">
-        <label for="name">Имя пользователя:</label>
-        <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
+
+    <h1>Личный кабинет: {{ user.username }}</h1>
+
+    <div class="container">
+        <form method="POST">
+
+            <label>Краткая информация:</label>
+            <textarea name="info_short" class="info">{{ user.info_short }}</textarea>
+
+            <label>Развернутая информация:</label>
+            <textarea name="info_full" class="info">{{ user.info_full }}</textarea>
+
+            <label>Список проектов:</label>
+            <textarea name="projects" class="info">{{ user.projects }}</textarea>
+
+            <button type="submit">Сохранить изменения</button>
+        </form>
+
+        <a href="/home">⬅ Вернуться на главную</a>
     </div>
 
-    <div>
-        <label for="surname">Фамилия пользователя:</label>
-        <input type="text" id="surname" name="surname" placeholder="Введите вашу Фамилию" required> 
-    </div>
-
-    <div class="form-group">
-        <label for="password">Логин:</label>
-        <input type="text" id="login" name="login" placeholder="Введите ваш Логин" required>
-    </div>
-        <label for="email">email:</label>
-        <input type="email" id="email" name="email" placeholder="Введите ваш email" required>
-    <div>
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required>
-    </div>
-
-    <div>
-        <label for="birthdate">Пароль:</label>
-        <input type="date" id="birthdate" name="birthdate" placeholder="Введите вашу дату рождения" required>
-    </div>
-
-            <button type="submit" id="loginBtn">Войти</button>
-</form>
 </body>
 </html>

@@ -9,17 +9,14 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            background: linear-gradient(135deg, #f09b3b 0%, #f3e284 100%);
             color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            justify-content: flex-start;
             text-align: center;
-        }
-        #n1{
-            background-color: #54dbc9;
         }
         h1 {
             font-size: 3rem;
@@ -39,12 +36,14 @@
         }
 
         #change_page {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #ffac4e;
+            border: 2px solid #000000;
+
+            color: rgb(0, 0, 0);
         }
 
         #change_page:hover {
-            background-color: #45a049;
+            background-color: #ffbc58;
             transform: scale(1.05);
         }
 
@@ -59,8 +58,7 @@
         }
 
         footer {
-            position: absolute;
-            bottom: 15px;
+            margin-top: 40px;
             font-size: 0.9rem;
             color: #555;
         }
@@ -88,9 +86,11 @@
              <div class="str">
                 <textarea class="info" id="info1" placeholder="Личная информация"></textarea>
                 <textarea class="info" id="info2" placeholder="Работа с учетной записью"></textarea>
-                <textarea class="info" id="info3" placeholder="Краткая информация"></textarea>
-                <textarea class="info" id="info4" placeholder="Развернутая информация"></textarea>
-                <textarea class="info" id="info5" placeholder="Список проектов"></textarea>
+                <textarea name="info_short" placeholder="Краткая информация" class="info">{{ user.info_short }}</textarea>
+                <textarea name="info_full" placeholder="Развернутая информация" class="info">{{ user.info_full }}</textarea>
+                <textarea name="projects" placeholder="Список проектов" class="info">{{ user.projects }}</textarea>
+
+                <button id="save "type="submit">Сохранить</button>
             </div>
 
             <script>
@@ -105,14 +105,23 @@
                     });
                 });
             </script>
-            <a id="logout" href="/logout">👋 Покинуть нас</a>
+            <a id="logout" href="/logout">Покинуть нас</a>
         {% else %}
             <a id="change_page" href="/admins">Войти в аккаунт</a>
+            <h1>Список пользователей</h1>
+
+            {% for u in users %}
+                <div class="user-card" style="margin:20px; padding:15px; border:2px solid #000; border-radius:10px; background:#fff;">
+                    <h2>{{ u.username }}</h2>
+
+                    <textarea class="info" readonly>{{ u.info_short }}</textarea>
+                    <textarea class="info" readonly>{{ u.info_full }}</textarea>
+                    <textarea class="info" readonly>{{ u.projects }}</textarea>
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
     
-    
-    <footer>Автоматический выход произойдет через 3 минуты бездействия ⏳</footer>
 
     <script>
         const INACTIVITY_LIMIT = 3 * 60 * 1000;

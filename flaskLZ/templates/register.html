@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ebcf74 0%, #9face6 100%);
+            background: linear-gradient(135deg, #f09b3b 0%, #f3e284 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -24,6 +24,7 @@
             width: 100%;
             max-width: 420px;
             text-align: center;
+            border: 2px solid #000000;
         }
 
         h1 {
@@ -60,8 +61,8 @@
         button {
             width: 100%;
             padding: 12px;
-            background-color: #f36e21;
-            color: white;
+            background-color: #f8782d;
+            color: rgb(0, 0, 0);
             border: none;
             border-radius: 6px;
             font-size: 1.1rem;
@@ -70,24 +71,24 @@
         }
 
         button:hover {
-            background-color: #f0bb29;
+            background-color: #fda684;
             transform: scale(1.03);
         }
 
         .error-message {
             margin-bottom: 15px;
             font-size: 0.95rem;
-            color: #d32f2f;
+            color: #d3712f;
         }
 
         .success-message {
             margin-bottom: 15px;
             font-size: 0.95rem;
-            color: #eec43a;
+            color: #f76b6b;
         }
 
         a#login {
-            color: #2196F3;
+            color: #f35221;
             text-decoration: none;
             font-weight: bold;
         }
@@ -121,14 +122,7 @@
                 <input type="password" id="password" name="password" placeholder="Введите пароль" required>
             </div>
 
-            
-
             <button type="submit">Зарегистрироваться</button>
-
-            <div class="captcha">
-                <img src="demo.png">
-                <input type="text">
-            </div>
 
         </form>
 
