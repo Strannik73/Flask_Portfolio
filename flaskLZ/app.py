@@ -1,28 +1,27 @@
+from datetime import timedelta
 from flask import Flask, render_template, session, redirect, url_for, request
 from auth import auth, db, Users
-from datetime import timedelta
+from logs import init_logs_db, log_event
 
 app = Flask(__name__)
 
 app.secret_key = "secret"
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=10)
 
-app.config.update(
-    SECRET_KEY="secret",
-    SQLALCHEMY_DATABASE_URI='sqlite:///main.db',
-    SQLALCHEMY_BINDS={
-        'users': 'sqlite:///users.db',
-        'info': 'sqlite:///info.db'
-    },
-    SQLALCHEMY_TRACK_MODIFICATIONS=False
-)
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=3)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///main.db"
+app.config["SQLALCHEMY_BINDS"] = {
+    "users": "sqlite:///users.db",
+    "info": "sqlite:///info.db"
+}
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
 
-# Модель info.db
+# таблица info.db
 class UserInfo(db.Model):
-    __bind_key__ = 'info'
+    __bind_key__ = "info"
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=True)
@@ -34,7 +33,7 @@ class UserInfo(db.Model):
     projects = db.Column(db.Text, default="")
 
 
-# Главная страница
+# HOME
 @app.route("/")
 @app.route("/home")
 def home():
@@ -52,17 +51,16 @@ def home():
     )
 
 
-# Личный кабинет
 @app.route("/ls", methods=["GET", "POST"])
 def ls():
     username = session.get("username")
-
     if not username:
-        return redirect(url_for("home"))
-
+        return redirect(url_for("auth.login"))
+    
     user = Users.query.filter_by(username=username).first()
-
-    user_info = UserInfo.query.filter_by(username=username).first()
+    user_info = UserInfo.query.filter_by(
+        username=username
+    ).first()
 
     if not user_info:
         user_info = UserInfo(username=username)
@@ -70,17 +68,11 @@ def ls():
         db.session.commit()
 
     if request.method == "POST":
-
-        fields = [
-            "info1",
-            "info2",
-            "info_short",
-            "info_full",
-            "projects"
-        ]
-
-        for field in fields:
-            setattr(user_info, field, request.form.get(field, ""))
+        user_info.info1 = request.form.get("info1", "")
+        user_info.info2 = request.form.get("info2", "")
+        user_info.info_short = request.form.get("info_short", "")
+        user_info.info_full = request.form.get("info_full", "")
+        user_info.projects = request.form.get("projects", "")
 
         db.session.commit()
 
@@ -90,13 +82,12 @@ def ls():
         user_info=user_info
     )
 
-
-# Выход
 @app.route("/logout")
 def logout():
+    username = session.get("username")
+    log_event(username, "LOGOUT", "SUCCESS")
     session.clear()
     return redirect(url_for("home"))
-
 
 app.register_blueprint(auth)
 
@@ -104,5 +95,5 @@ app.register_blueprint(auth)
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-
+        init_logs_db()
     app.run(debug=True)
