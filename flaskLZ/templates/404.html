@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Страница не найдена</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    h1 { color: #7f8c8d; }
+    a { color: #f37826; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Ошибка 404</h1>
+  <h1>Страница не найдена</h1>
+  <p>Запрошенная страница не существует.</p>
+  {% if user %}
+    <p>Пользователь: <strong>{{ user }}</strong></p>
+  {% endif %}
+  <p><a href="{{ url_for('home') }}">Вернуться на главную</a></p>
+</body>
+</html>

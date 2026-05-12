@@ -7,8 +7,8 @@ app = Flask(__name__)
 
 app.secret_key = "secret"
 
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=3)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///main.db"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(seconds=180)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_BINDS"] = {
     "users": "sqlite:///users.db",
     "info": "sqlite:///info.db"
@@ -19,7 +19,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 
-# таблица info.db
 class UserInfo(db.Model):
     __bind_key__ = "info"
 
@@ -33,7 +32,6 @@ class UserInfo(db.Model):
     projects = db.Column(db.Text, default="")
 
 
-# HOME
 @app.route("/")
 @app.route("/home")
 def home():
@@ -82,6 +80,24 @@ def ls():
         user_info=user_info
     )
 
+@app.errorhandler(403)
+def handle_403(error):
+    username = session.get("username")
+    try:
+        log_event(username, "ERROR_403", str(error))
+    except Exception:
+        pass
+    return render_template("403.html", user=username, error=str(error)), 403
+
+@app.errorhandler(404)
+def handle_404(error):
+    username = session.get("username")
+    try:
+        log_event(username, "ERROR_404", str(error))
+    except Exception:
+        pass
+    return render_template("404.html", user=username, error=str(error)), 404
+
 @app.route("/logout")
 def logout():
     username = session.get("username")
@@ -96,4 +112,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         init_logs_db()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, ssl_context=('cert.pem', 'key.pem'), debug=False)
